@@ -7,9 +7,11 @@ const  visited : Set<string>= new Set()
 
 
 function enqueue(url :string){
-    if(typeof url === null || typeof url === undefined) return "Url can't be null/Undefined";
-   
+    // if(typeof url === null || typeof url === undefined) return "Url can't be null/Undefined";
+    // typeof return string remember
+   if(url === null || url === undefined) return "Url Cannot be null/Undefined"
     
+
     queue.push(url)
 
     console.log("Url Pushed To the queue")
@@ -24,8 +26,9 @@ function enqueue(url :string){
 }
 
 function dequeue(){
-    queue.shift() // remove the first element of the array
-    console.log("Url removed from the queue")
+    console.log("Removing url from the queue")
+    return queue.shift() // remove the first element of the array
+    
 }
 
 
@@ -35,7 +38,7 @@ function dequeue(){
 
 
 return { 
-    enqueue , dequeue , addToVisited , queue
+    enqueue , dequeue , addToVisited , isEmpty
 }
 
 
