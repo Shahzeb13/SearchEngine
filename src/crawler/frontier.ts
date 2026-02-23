@@ -36,9 +36,21 @@ function dequeue(){
     return queue.length === 0
   }
 
+  function getQueue(secretKey : string){
+    const mySecret = 'hello';
+    if(secretKey === mySecret){
+        return queue
+    }
+    else {
+        return null;
+    }
+    
+  
+  }
+
 
 return { 
-    enqueue , dequeue , addToVisited , isEmpty
+    enqueue , dequeue , addToVisited , isEmpty ,getQueue
 }
 
 
