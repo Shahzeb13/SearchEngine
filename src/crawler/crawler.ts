@@ -1,5 +1,6 @@
 import { Frontier } from "./frontier.ts"
 import { fetchPages } from "./fetcher.ts";
+import { extractLinks } from "./parser.ts";
 // const Frontier = require("./frontier.ts")
 const url = "https://www.spyroinc.com/"
 
@@ -16,9 +17,10 @@ export async function Crawl(){
 //     // will implement here
 // }
 
-const data =await fetchPages(url);
-console.log("fetched data from srouce" , data)
-
+const html =await fetchPages(url);
+// console.log("fetched data from srouce" , html)
+console.log("Extracting Links")
+await extractLinks(html)
 
 }
 
