@@ -49,3 +49,14 @@ export function getUniqueUrls(filteredLinks: string[]) {
 
 
 //today i learned about pipeline pattern , guard clause pattern and separation of concerens principles
+
+export function convertIntoAbsoluteUrls(uniqueLinks : string[] , baseUrl : string){
+
+
+    const absoluteURLs = uniqueLinks.map((link) => {
+        return new URL(link, baseUrl).href
+    })
+
+    return absoluteURLs
+
+}
