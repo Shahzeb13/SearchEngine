@@ -1,4 +1,4 @@
-import { Crawl } from "./crawler/crawler.ts";
+import { Crawl } from "./crawler/crawler.js";
 console.log("Codebase Changed");
 // const Crawl = require("./crawler/crawler")
 

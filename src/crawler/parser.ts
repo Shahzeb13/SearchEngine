@@ -1,7 +1,5 @@
 // Link extraction algorithm (no libraries)
 
-import { linkSync } from "node:fs";
-
 // Scan the HTML for href=
 
 // After href=, the value is inside quotes: "..." or '...'
@@ -25,8 +23,8 @@ let match : RegExpExecArray | null;
 
 
     while((match = hrefRegex.exec(html)) !== null){
-        console.log(match[0]);
-        console.log(match[1]);
+        // console.log(match[0]);
+        // console.log(match[1]);
     
         saveLinks(match[1]  , links)
 
@@ -34,9 +32,9 @@ let match : RegExpExecArray | null;
 }
 
 
-console.log("LInks" , links)
+// console.log("LInks" , links)
 
-
+    return links
         
 
 
