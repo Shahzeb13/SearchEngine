@@ -7,15 +7,20 @@ export function Frontier() {
 
 
   function enqueue(url: string) {
-    // if(typeof url === null || typeof url === undefined) return "Url can't be null/Undefined";
-    // typeof return string remember
-    if (url === null || url === undefined) return "Url Cannot be null/Undefined"
+    if (url === null || url === undefined) return;
+    
+    // Simple duplicate check: don't add if already visited or in queue
+    if (visited.has(url) || queue.includes(url)) {
+      console.log("Cannot enqueue this url cause either it's already in visited or in Queue")
+      return
+    };
 
+    queue.push(url);
+    console.log(`Url Pushed To the queue: ${url}`);
+  }
 
-    queue.push(url)
-
-    console.log("Url Pushed To the queue")
-
+  function hasVisited(url: string) {
+    return visited.has(url);
   }
 
   function addToVisited(url: string) {
@@ -23,10 +28,11 @@ export function Frontier() {
     visited.add(url);
 
     console.log("Url Added to visited")
+    console.log("Logging Visited :" , visited)
   }
 
   function dequeue() {
-    console.log("Removing url from the queue")
+    console.log("Removing url from the queue ( Means we will visit this current url")
     return queue.shift() // remove the first element of the array
 
   }
@@ -50,7 +56,7 @@ export function Frontier() {
 
 
   return {
-    enqueue, dequeue, addToVisited, isEmpty, getQueue
+    enqueue, dequeue, addToVisited, isEmpty, getQueue, hasVisited
   }
 
 
