@@ -3,7 +3,7 @@ import { fetchPages } from "./fetcher.js";
 import { extractLinks } from "./parser.js";
 import { convertIntoAbsoluteUrls, filterPipeline, getUniqueUrls } from "./urlManager.js";
 // const Frontier = require("./frontier.ts")
-const seedUrl = "https://www.spyroinc.com/"
+const seedUrl = "https://www.wikipedia.org/"
 const frontier = Frontier();
 
 export async function Crawl() {
@@ -27,17 +27,17 @@ export async function Crawl() {
         console.log(`\n>>> Processing: ${currentUrl}`);
 
         // 1. Fetch the page content
-        const html = await fetchPages(currentUrl);  
+        const html = await fetchPages(currentUrl);
 
         // Mark as visited regardless of success to avoid infinite retries on broken links
         frontier.addToVisited(currentUrl);
-        
+
 
         if (!html) {
             console.log(`Skipping: No content retrieved from ${currentUrl}`);
             continue;
         }
-        
+
 
         // 2. Extract links from the HTML
         const rawLinks = await extractLinks(html);
@@ -60,7 +60,7 @@ export async function Crawl() {
     }
 
     console.log("\nCrawl completed! No more URLs in frontier(Queue).");
-  
+
 }
 
 
