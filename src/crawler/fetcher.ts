@@ -1,5 +1,9 @@
 import axios, { isAxiosError } from "axios";
 
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export async function fetchPages(url: string, retries = 2) {
   for (let attempt = 1; attempt <= retries + 1; attempt++) {
     try {
@@ -17,6 +21,15 @@ export async function fetchPages(url: string, retries = 2) {
     } catch (err: unknown) {
 
       if (isAxiosError(err)) {
+
+        // If rate limited (429) → wait and retry
+        if (err.response && err.response.status === 429) {
+          const retryAfter = err.response.headers['retry-after'];
+          const waitMs = retryAfter ? parseInt(retryAfter, 10) * 1000 : 5000;
+          console.log(`429 Too Many Requests. Waiting ${waitMs / 1000}s before retry...`);
+          await sleep(waitMs);
+          continue;
+        }
 
         // If timeout or network issue → retry
         if (!err.response) {

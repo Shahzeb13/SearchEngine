@@ -1,12 +1,18 @@
 import { Frontier } from "./frontier.js"
 import { fetchPages } from "./fetcher.js";
 import { extractLinks } from "./parser.js";
-import { convertIntoAbsoluteUrls, filterPipeline, getUniqueUrls } from "./urlManager.js";
+import { convertIntoAbsoluteUrls, filterPipeline, getUniqueUrls, isValidArticleUrl } from "./urlManager.js";
 // const Frontier = require("./frontier.ts")
-const seedUrl = "https://www.wikipedia.org/"
+const seedUrl = "https://en.wikipedia.org/"
+const seedDomain = new URL(seedUrl).hostname;
 const frontier = Frontier();
+const CRAWL_DELAY_MS = 1000;
 
-export async function Crawl() {
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export async  function Crawl() {
     // Start by adding the seed URL to the frontier
     frontier.enqueue(seedUrl);
 
@@ -41,12 +47,14 @@ export async function Crawl() {
 
         // 2. Extract links from the HTML
         const rawLinks = await extractLinks(html);
-
+        // console.log(`raw links : ${rawLinks}`)
         // 3. Filter out junk (admin pages, files, mailto, etc.)
         const filteredLinks = filterPipeline(rawLinks);
-
+        
         // 4. Remove duplicates found on this specific page
+      
         const uniqueLinks = getUniqueUrls(filteredLinks);
+        
 
         // 5. Convert relative links to absolute URLs
         const absoluteURLs = convertIntoAbsoluteUrls(uniqueLinks, currentUrl);
@@ -55,8 +63,12 @@ export async function Crawl() {
 
         // 6. Push discovered links into the frontier for future crawling
         for (const nextUrl of absoluteURLs) {
+            if (!isValidArticleUrl(nextUrl, seedDomain)) continue;
             frontier.enqueue(nextUrl);
         }
+
+        // 7. Be polite — wait before the next request
+        await sleep(CRAWL_DELAY_MS);
     }
 
     console.log("\nCrawl completed! No more URLs in frontier(Queue).");

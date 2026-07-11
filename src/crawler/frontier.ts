@@ -1,3 +1,4 @@
+import { LockMyDomain } from "../utils/lockDomain.ts";
 
 export function Frontier() {
 
@@ -11,12 +12,13 @@ export function Frontier() {
     
     // Simple duplicate check: don't add if already visited or in queue
     if (visited.has(url) || queue.includes(url)) {
-      console.log("Cannot enqueue this url cause either it's already in visited or in Queue")
+      console.log("Already Visited or Already Waiting in Queue");
       return
     };
+   
 
     queue.push(url);
-    console.log(`Url Pushed To the queue: ${url}`);
+    console.log(`Url Pushed To Queue: ${url}`);
   }
 
   function hasVisited(url: string) {
