@@ -70,3 +70,37 @@ function saveLinks(match : string  | undefined, links : string[]){
         // console.log(links)
 
 }
+
+export function extractContent(html :string){
+    const $ = cheerio.load(html)
+      // Remove junk BEFORE extracting text, so it doesn't pollute content
+    $('.reference').remove();        // citation superscripts like [1]
+    $('table.infobox').remove();     // side info boxes
+    $('table.navbox').remove();      // navigation boxes at bottom
+    $('.hatnote').remove();          // "For other uses, see..." notes
+    $('sup').remove();               // any remaining superscripts
+    $('style, script').remove();     // just in case
+
+
+
+
+    const title = $('#firstHeading').text().trim();
+
+     const paragraphs = $('.mw-parser-output p')
+        .map((_, el) => $(el).text().trim())
+        .get()
+        .filter(text => text.length > 0); // drop empty <p> tags
+
+    const description = paragraphs[0] || '';
+    const content = paragraphs.join('\n\n');
+
+    return { title, description, content };
+
+}
+
+
+
+// so this fucntion return me title description content
+// tullo na pehla bo kho mo u hashset use kavuna shi 
+// id bo uuid jur kan 
+
