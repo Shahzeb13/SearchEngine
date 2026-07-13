@@ -18,6 +18,9 @@ export function filterPipeline(links: string[]) {
         ".pdf"
     ];
 
+
+    // /wiki/Cat#History becomes /wiki/  ua necha wali line link.splite("#")[0] ek array return karti ha but us links
+    //ma sa# ka bad wali shit remove kr deti hain
     const cleaned = links.map(link => link.split("#")[0]!).filter(link => {
         if (!link || link === "/") return false;
 
@@ -27,10 +30,19 @@ export function filterPipeline(links: string[]) {
         if (isBlockedExtension) return false;
         if (isBlockedPrefix) return false;
 
+// any link that isn't an email/phone/admin/internal-asset/junk link — so a pretty wide net at this stage, including stuff like:
+
+// /wiki/Cat — actual article links (what you want)
+// /wiki/Category:Mammals — namespace/category pages (still gets through here, since : filtering happens later in isValidArticleUrl, not here)
+// /w/index.php?title=Cat&action=edit — MediaWiki special pages, edit links, etc.
+// https://en.wikipedia.org/wiki/Dog — full absolute URLs, if any snuck in
+// //upload.wikimedia.org/... — protocol-relative links (not blocked, since they don't match your prefixes)
+// /wiki/Special:Random — special pages
+// Query-param links like /wiki/Cat?oldid=12345 — allowed through here, since query rejection only happens in isValidArticleUrl
         return true;
     });
 
-    return cleaned;
+    return cleaned; // stirng array 
 }
 
 
@@ -84,17 +96,6 @@ export function isValidArticleUrl(url: string, seedDomain: string): boolean {
     return true;
 }
 
-interface CrawledPage {
-  id: string;              // unique id (can be a hash of the URL, or just the URL itself)
-  url: string;              // canonical URL (normalized, no fragment/query)
-  title: string;             // page title
-  description: string;       // short summary — first paragraph or meta description
-  content: string;           // full extracted body text (for indexing)
-  links: string[];           // outgoing links found on this page (useful for link-based ranking later, e.g. PageRank)
-  wordCount: number;         // handy for ranking/debugging
-  crawledAt: string;         // ISO timestamp of when you crawled it
-  depth: number;             // BFS depth from your seed URL — useful metadata
-}
 
 
 // ┌─────────────┐         ┌──────────────┐         ┌─────────────┐

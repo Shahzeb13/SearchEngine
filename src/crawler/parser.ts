@@ -86,7 +86,7 @@ export function extractContent(html :string){
 
     const title = $('#firstHeading').text().trim();
 
-     const paragraphs = $('.mw-parser-output > p')
+     const paragraphs = $('.mw-parser-output p')
         .map((_, el) => $(el).text().trim())
         .get()
         .filter(text => text.length > 0); // drop empty <p> tags
@@ -97,3 +97,10 @@ export function extractContent(html :string){
     return { title, description, content };
 
 }
+
+
+
+// so this fucntion return me title description content
+// tullo na pehla bo kho mo u hashset use kavuna shi 
+// id bo uuid jur kan 
+

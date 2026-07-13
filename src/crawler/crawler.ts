@@ -2,11 +2,34 @@ import { Frontier } from "./frontier.js"
 import { fetchPages } from "./fetcher.js";
 import { extractLinks } from "./parser.js";
 import { convertIntoAbsoluteUrls, filterPipeline, getUniqueUrls, isValidArticleUrl } from "./urlManager.js";
+import { extractContent } from "./parser.js";
+import { CrawledPage } from "./types/IndexerDocsType.ts";
+import { generateUUID } from "../utils/generateRandomUUID.ts";
+import fs from "fs"
+import path from "path";
+import {fileURLToPath} from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
+
+
+export const indexerDocs:CrawledPage[] = [];
+
+process.on("SIGINT" , () =>{
+
+    console.log("shutiing down , saving indexerDOcs data ....");
+    fs.writeFileSync(path.join(__dirname , "Indexerdocs.json" ), JSON.stringify(indexerDocs , null , 2));
+    process.exit(0);
+})
 // const Frontier = require("./frontier.ts")
 const seedUrl = "https://en.wikipedia.org/"
 const seedDomain = new URL(seedUrl).hostname;
 const frontier = Frontier();
 const CRAWL_DELAY_MS = 1000;
+
+
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -18,7 +41,7 @@ export async  function Crawl() {
 
     console.log(`Starting crawl from: ${seedUrl}`);
 
-    while (!frontier.isEmpty()) {
+    while (!frontier.isEmpty() && indexerDocs.length <= 30) {
         // Get the next URL from the queue
         const currentUrl = frontier.dequeue();
         console.log("Current Url being crawled : ", currentUrl)
@@ -35,6 +58,9 @@ export async  function Crawl() {
         // 1. Fetch the page content
         const html = await fetchPages(currentUrl);
 
+
+        
+
         // Mark as visited regardless of success to avoid infinite retries on broken links
         frontier.addToVisited(currentUrl);
 
@@ -44,9 +70,15 @@ export async  function Crawl() {
             continue;
         }
 
+        
+
+
+
 
         // 2. Extract links from the HTML
         const rawLinks = await extractLinks(html);
+
+        
         // console.log(`raw links : ${rawLinks}`)
         // 3. Filter out junk (admin pages, files, mailto, etc.)
         const filteredLinks = filterPipeline(rawLinks);
@@ -54,11 +86,17 @@ export async  function Crawl() {
         // 4. Remove duplicates found on this specific page
       
         const uniqueLinks = getUniqueUrls(filteredLinks);
-        
+        //will strip of any fucking duplicate urls 
 
         // 5. Convert relative links to absolute URLs
         const absoluteURLs = convertIntoAbsoluteUrls(uniqueLinks, currentUrl);
+        console.log("populating the indexerDocs");
+        const doc  =  extractContent(html);
+        const uuid = generateUUID();
+        indexerDocs.push({...doc , uuid , currentUrl});
+        
 
+        console.log("indexer DOcs: " , indexerDocs);
         console.log(`Found ${absoluteURLs.length} valid links. Adding to queue...`);
 
         // 6. Push discovered links into the frontier for future crawling
@@ -72,7 +110,10 @@ export async  function Crawl() {
     }
 
     console.log("\nCrawl completed! No more URLs in frontier(Queue).");
-
+    fs.writeFileSync(path.join(__dirname, "Indexerdocs.json"), JSON.stringify(indexerDocs, null, 2));
+    console.log(`Saved ${indexerDocs.length} docs to Indexerdocs.json`);
+    console.log("Printing Indexdocs to verify");
+    console.log(indexerDocs)
 }
 
 
